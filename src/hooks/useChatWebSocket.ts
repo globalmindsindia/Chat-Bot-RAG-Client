@@ -28,7 +28,7 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
       (ws.current.readyState === 1 || ws.current.readyState === 0)
     )
       return;
-    ws.current = new WebSocket("https://api.chat.globalmindsindia.com/ws/chat");
+    ws.current = new WebSocket("wss://api.chat.globalmindsindia.com/ws/chat");
     ws.current.onopen = () => {
       setResponse("");
       setPartialResponse("");
