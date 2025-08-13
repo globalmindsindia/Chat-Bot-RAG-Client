@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from "react";
 
 interface ChatMessage {
   message: string;
@@ -16,30 +16,34 @@ interface UseChatWebSocketReturn {
 
 export function useChatWebSocket(): UseChatWebSocketReturn {
   const ws = useRef<WebSocket | null>(null);
-  const [response, setResponse] = useState('');
-  const [partialResponse, setPartialResponse] = useState('');
+  const [response, setResponse] = useState("");
+  const [partialResponse, setPartialResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
 
   const connect = useCallback(() => {
-    if (ws.current && (ws.current.readyState === 1 || ws.current.readyState === 0)) return;
-    ws.current = new WebSocket('http://127.0.0.1:5000/ws/chat');
+    if (
+      ws.current &&
+      (ws.current.readyState === 1 || ws.current.readyState === 0)
+    )
+      return;
+    ws.current = new WebSocket("https://api.chat.globalmindsindia.com/ws/chat");
     ws.current.onopen = () => {
-      setResponse('');
-      setPartialResponse('');
+      setResponse("");
+      setPartialResponse("");
       setConnected(true);
       setError(null);
     };
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.error) {
-        setResponse(prev => prev + '\n[Error] ' + data.error + '\n');
+        setResponse((prev) => prev + "\n[Error] " + data.error + "\n");
         setLoading(false);
         setError(data.error);
       } else if (data.chunk) {
-        setPartialResponse(prev => {
-          if (prev.endsWith(' ') && data.chunk.startsWith(' ')) {
+        setPartialResponse((prev) => {
+          if (prev.endsWith(" ") && data.chunk.startsWith(" ")) {
             return prev + data.chunk.trimStart();
           } else {
             return prev + data.chunk;
@@ -47,9 +51,9 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
         });
         setLoading(true);
       } else if (data.end) {
-        setResponse(partialResponse => partialResponse);
+        setResponse((partialResponse) => partialResponse);
         setLoading(false);
-        setPartialResponse('');
+        setPartialResponse("");
       }
     };
     ws.current.onclose = () => {
@@ -58,23 +62,33 @@ export function useChatWebSocket(): UseChatWebSocketReturn {
     };
     ws.current.onerror = () => {
       setLoading(false);
-      setError('WebSocket error');
+      setError("WebSocket error");
     };
   }, []);
 
-  const sendMessage = useCallback((msg: string) => {
-    setResponse('');
-    setPartialResponse('');
-    setLoading(true);
-    setError(null);
-    if (!ws.current || ws.current.readyState !== 1) connect();
-    setTimeout(() => {
-      ws.current?.send(JSON.stringify({ message: msg, history: [] }));
-    }, 100);
-  }, [connect]);
+  const sendMessage = useCallback(
+    (msg: string) => {
+      setResponse("");
+      setPartialResponse("");
+      setLoading(true);
+      setError(null);
+      if (!ws.current || ws.current.readyState !== 1) connect();
+      setTimeout(() => {
+        ws.current?.send(JSON.stringify({ message: msg, history: [] }));
+      }, 100);
+    },
+    [connect]
+  );
 
   // Compose the full response for display
   const displayResponse = partialResponse || response;
 
-  return { response: displayResponse, loading, error, connect, sendMessage, connected };
+  return {
+    response: displayResponse,
+    loading,
+    error,
+    connect,
+    sendMessage,
+    connected,
+  };
 }
