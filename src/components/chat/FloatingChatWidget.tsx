@@ -35,10 +35,10 @@ const FloatingChatWidget = () => {
     <>
       {/* Chat popup */}
       {isOpen && (
-        <div
-          className="fixed bottom-36 right-6 w-96 h-[600px] bg-white border border-gray-200 rounded-lg shadow-2xl z-[9999] animate-in slide-in-from-bottom-2 fade-in-0 duration-300"
-          style={{ zIndex: 2147483646 }} // High z-index but below React dev tools
-        >
+          <div
+            className="absolute bottom-0 right-0 w-96 h-[600px] bg-white border border-gray-200 rounded-lg shadow-2xl z-[9999] animate-in slide-in-from-bottom-2 fade-in-0 duration-300"
+            style={{ zIndex: 2147483646 }} // High z-index but below React dev tools
+          >
           <ChatInterface onClose={() => setIsOpen(false)} />
         </div>
       )}

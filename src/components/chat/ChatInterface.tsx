@@ -122,10 +122,14 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
         backgroundImage: `url(${chatBackdrop})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
       }}
     >
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-lg"></div>
+    <div className="absolute inset-0 bg-background/0 backdrop-blur-none rounded-lg"></div>
       <div className="relative z-10 flex flex-col h-full">
         <ChatHeader onClose={onClose} />
       
