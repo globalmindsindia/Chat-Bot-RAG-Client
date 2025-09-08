@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:css": "tailwindcss -i ./src/index.css -o ./dist/global-chat-widget.css --minify",
-    "build": "vite build && npm run build:css",
+    "build:css": "tailwindcss -i ./src/index.css -o ./public/global-chat-widget.css --minify",
+    "build": "vite build && npm run build:css && cp dist/global-chat-widget.umd.js public/",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"

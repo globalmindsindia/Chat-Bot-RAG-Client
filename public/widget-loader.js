@@ -7,13 +7,13 @@
     document.body.appendChild(el);
   }
 
-  // Always use localhost
-  const cssHref =
-    "https://chat.globalmindsindia.com/dist/global-chat-widget.css";
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = cssHref;
-  document.head.appendChild(link);
+  const cssHref = "https://chat.globalmindsindia.com/global-chat-widget.css";
+  if (!document.querySelector(`link[href="${cssHref}"]`)) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = cssHref;
+    document.head.appendChild(link);
+  }
 
   function load(src, cb) {
     const s = document.createElement("script");
@@ -25,7 +25,7 @@
 
   function loadWidget() {
     const bundleUrl =
-      "https://chat.globalmindsindia.com/dist/global-chat-widget.umd.js";
+      "https://chat.globalmindsindia.com/global-chat-widget.umd.js";
     load(bundleUrl, () => {
       if (typeof window.initGlobalChat === "function") {
         window.initGlobalChat({ containerId: ID });
