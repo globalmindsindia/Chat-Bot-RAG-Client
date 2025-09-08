@@ -1,6 +1,6 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import FloatingChatWidget from "./components/chat/FloatingChatWidget";
+import "./index.css";
 
 declare global {
   interface Window {

@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    cssCodeSplit: true,
     lib: {
       entry: path.resolve(__dirname, "src/widget-entry.tsx"),
       name: "GlobalChatWidget",
@@ -24,11 +25,16 @@ export default defineConfig(({ mode }) => ({
       formats: ["umd"],
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      // Remove externals to bundle React and ReactDOM
+      // external: ["react", "react-dom"],
       output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
+        // Remove globals mapping
+        // globals: { react: "React", "react-dom": "ReactDOM" },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+            return "global-chat-widget.css";
+          }
+          return "assets/[name][extname]";
         },
       },
     },
