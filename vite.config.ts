@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(mode), // or "production"
+  },
   plugins: [react(), mode === "development" ? componentTagger() : null].filter(
     Boolean
   ),
