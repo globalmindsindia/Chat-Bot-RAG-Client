@@ -1,130 +1,101 @@
 import { useRef, useState, useCallback } from "react";
- 
-interface ChatMessage {
-message: string;
-history: any[];
-}
- 
-interface UseChatWebSocketReturn {
-response: string;
-loading: boolean;
-error: string | null;
-connect: () => void;
-sendMessage: (msg: string) => void;
-connected: boolean;
-}
- 
-export function useChatWebSocket(): UseChatWebSocketReturn {
+
+export function useChatWebSocket() {
   const ws = useRef<WebSocket | null>(null);
+
   const [response, setResponse] = useState("");
-  const [partialResponse, setPartialResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
-  const messageQueue = useRef<string[]>([]);
-  const isConnecting = useRef(false);
 
-  // Helper to open socket and set up listeners
+  // STREAM buffer
+  const bufferRef = useRef<string>("");
+
+  // Track pending single message
+  const pendingMessage = useRef<string | null>(null);
+
   const connect = useCallback(() => {
-    if (
-      ws.current &&
-      (ws.current.readyState === WebSocket.OPEN || ws.current.readyState === WebSocket.CONNECTING)
-    ) {
-      console.log("WebSocket already open or connecting");
-      return;
-    }
-    console.log("WebSocket connecting...");
-    isConnecting.current = true;
+    if (ws.current && ws.current.readyState !== WebSocket.CLOSED) return;
+
     ws.current = new WebSocket("wss://api.chat.globalmindsindia.com/ws/chat");
+
     ws.current.onopen = () => {
-      console.log("WebSocket open");
-      setResponse("");
-      setPartialResponse("");
       setConnected(true);
       setError(null);
-      isConnecting.current = false;
-      // Send any queued messages
-      if (messageQueue.current.length > 0) {
-        console.log("Sending queued messages...");
-        while (messageQueue.current.length > 0 && ws.current?.readyState === WebSocket.OPEN) {
-          const queuedMsg = messageQueue.current.shift();
-          if (queuedMsg) {
-            ws.current.send(queuedMsg);
-          }
-        }
+
+      // If a message was waiting → send ONCE
+      if (pendingMessage.current) {
+        ws.current.send(pendingMessage.current);
+        pendingMessage.current = null;
       }
     };
+
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
+
       if (data.error) {
-        setResponse((prev) => prev + "\n[Error] " + data.error + "\n");
-        setLoading(false);
         setError(data.error);
-      } else if (data.chunk) {
-        setPartialResponse((prev) => {
-          if (prev.endsWith(" ") && data.chunk.startsWith(" ")) {
-            return prev + data.chunk.trimStart();
-          } else {
-            return prev + data.chunk;
-          }
-        });
-        setLoading(true);
-      } else if (data.end) {
-        setResponse((partialResponse) => partialResponse);
         setLoading(false);
-        setPartialResponse("");
+        return;
+      }
+
+      // Streaming chunk
+      if (data.chunk) {
+        bufferRef.current += data.chunk;
+        setLoading(true);
+        return;
+      }
+
+      // Final response
+      if (data.end) {
+        setResponse(bufferRef.current);
+        bufferRef.current = "";
+        setLoading(false);
+        return;
       }
     };
+
     ws.current.onclose = () => {
-      setLoading(false);
       setConnected(false);
-      isConnecting.current = false;
-      console.log("WebSocket closed");
     };
+
     ws.current.onerror = () => {
-      setLoading(false);
       setError("WebSocket error");
-      isConnecting.current = false;
-      console.log("WebSocket error");
+      setLoading(false);
     };
   }, []);
 
-  // Send message, waiting for socket to open if needed
-  const sendMessage = useCallback((msg: string) => {
-    setResponse("");
-    setPartialResponse("");
-    setLoading(true);
-    setError(null);
-    const payload = JSON.stringify({ message: msg, history: [] });
+  const sendMessage = useCallback(
+    (msg: string) => {
+      setError(null);
+      setLoading(true);
+      bufferRef.current = "";
+      setResponse("");
 
-    function trySend() {
+      const payload = JSON.stringify({ message: msg, history: [] });
+
+      // Always store 1 pending message
+      pendingMessage.current = payload;
+
+      // If socket ready → send immediately
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-        console.log("WebSocket sending message");
         ws.current.send(payload);
-      } else {
-        if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
-          connect();
-        }
-        // Queue the message and retry
-        if (!messageQueue.current.includes(payload)) {
-          messageQueue.current.push(payload);
-        }
-        console.log("WebSocket not open, retrying in 200ms");
-        setTimeout(trySend, 200);
+        pendingMessage.current = null;
+        return;
       }
-    }
-    trySend();
-  }, [connect]);
 
-  // Compose the full response for display
-  const displayResponse = partialResponse || response;
+      // Otherwise connect (message will send on open ONCE)
+      connect();
+    },
+    [connect]
+  );
 
   return {
-    response: displayResponse,
+    response,
     loading,
     error,
-    connect,
     sendMessage,
+    connect,
     connected,
   };
 }
