@@ -216,6 +216,25 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     setShowBackButton(false);
   };
 
+  const formatDateTimeReadable = (startTime: string) => {
+    const dateObj = new Date(startTime.replace(" ", "T"));
+
+    const date = dateObj.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    const time = dateObj.toLocaleTimeString("en-IN", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return { date, time };
+  };
+
   return (
     <div
       className="flex flex-col h-full bg-background rounded-lg overflow-hidden"
@@ -303,19 +322,21 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
                       setIsTyping(false);
 
                       if (res.success) {
+                        const { date, time } =
+                          formatDateTimeReadable(start_time);
+
                         setMessages((prev) => [
                           ...prev,
                           {
                             id: Date.now().toString(),
                             text: `✅ Your meeting has been successfully booked!
+                                  🗓 Date: ${date}
+                                  ⏰ Time: ${time}
 
-🗓 Date & Time: ${start_time}
-🔑 Meeting Key: ${res.meetingKey}
+                                  📧 The meeting link and details have been sent to your registered email.
+                                  Please check your inbox (and spam folder if needed).
 
-👉 Join Link:
-${res.joinLink}
-
-We look forward to speaking with you 😊`,
+                                  We look forward to speaking with you 😊`,
                             sender: "bot",
                             timestamp: new Date(),
                           },
