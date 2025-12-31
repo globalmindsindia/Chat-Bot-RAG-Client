@@ -6,30 +6,36 @@ export const chatFlow = {
       buttons: [
         { id: "explore", label: "Explore Study Abroad" },
         { id: "ielts", label: "IELTS / Foreign Language / VISA" },
-        { id: "accom", label: "Accommodation Abroad" },
-        { id: "jobs", label: "Job Opportunities" },
-        { id: "schedule", label: "📅 Schedule a Meeting" },
+        { id: "accom", label: "Accommodation Abroad", url: "https://globalmindsindia.com" },
+        { id: "jobs", label: "Job Opportunities", url: "https://fastlaneedu.com" },
+        { id: "internships", label: "Internships" },
+        { id: "schedule", label: "📅 Schedule a Counselling" },
+        { id: "achelp-desk", label: "HELP DESK", url: "" },
         { id: "others", label: "Others" },
       ],
     },
     SCHEDULE_NAME: {
-      message: "Sure 😊 What is your full name?",
+      message: "Sure! What is your full name?",
       buttons: [],
     },
     SCHEDULE_PHONE: {
-      message: "Please enter your phone number 📞",
+      message: "Please enter your phone number",
       buttons: [],
     },
     SCHEDULE_EMAIL: {
-      message: "Please enter your email address 📧",
+      message: "Please enter your email address",
+      buttons: [],
+    },
+    SCHEDULE_CONFIRM: {
+      message: "Please confirm your details before proceeding:",
       buttons: [],
     },
     SCHEDULE_DATE: {
-      message: "Select a preferred date from the calendar below 📅",
+      message: "Select a preferred date from the calendar below ",
       buttons: [],
     },
     SCHEDULE_SLOT: {
-      message: "Select an available time slot ⏰",
+      message: "Select an available time slot ",
       buttons: [],
     },
 
@@ -70,14 +76,13 @@ export const chatFlow = {
           label: "IELTS Prep",
           url: "https://globalmindsindia.co.in",
         },
-        { id: "gre_prep", label: "GRE" },
-        { id: "gmat_prep", label: "GMAT" },
+        
         {
           id: "toefl_prep",
           label: "TOEFL",
           url: "https://globalmindsindia.co.in",
         },
-        { id: "celpip_prep", label: "CELPIP" },
+        { id: "celpip_prep", label: "CELPIP", url:"https://globalmindsindia.co.in"},
         {
           id: "lang_train",
           label: "Foreign Language Training",
@@ -98,24 +103,17 @@ export const chatFlow = {
           label: "APS Documentation",
           url: "https://aps.globalmindsindia.in",
         },
+        { id: "gre_prep", label: "GRE", url: "https://globalmindsindia.com" },
+        { id: "gmat_prep", label: "GMAT", url: "https://globalmindsindia.com" },
         { id: "back_main", label: "⬅ Back to Main Menu" },
       ],
     },
-    ACCOM: {
-      message: "Accommodation — choose:",
+    
+    INTERNSHIPS: {
+      message: "Choose internship type:",
       buttons: [
-        { id: "shared", label: "Shared Accommodation" },
-        { id: "hostel", label: "Hostel/Uni Accom" },
-        { id: "rental", label: "Rental Docs/Help" },
-        { id: "back_main", label: "⬅ Back to Main Menu" },
-      ],
-    },
-    JOBS: {
-      message: "Job Opportunities — choose:",
-      buttons: [
-        { id: "intern", label: "Internships" },
-        { id: "placements", label: "Placements" },
-        { id: "work_perm", label: "Work Permission" },
+        { id: "domestic", label: "Domestic", url: "https://assessment.globalmindsindia.com" },
+        { id: "international", label: "International", url: "https://globalmindsindia.com" },
         { id: "back_main", label: "⬅ Back to Main Menu" },
       ],
     },
@@ -134,7 +132,7 @@ export const chatFlow = {
     back_explore: "EXPLORE",
     ielts: "IELTS",
     accom: "ACCOM",
-    jobs: "JOBS",
+    internships: "INTERNSHIPS",
     others: "OTHERS",
     cost: "COUNTRY_SELECTED",
     loans: "COUNTRY_SELECTED",
@@ -148,7 +146,9 @@ export const chatFlow = {
     shared: "ACCOM",
     hostel: "ACCOM",
     rental: "ACCOM",
-    intern: "JOBS",
+    intern: "INTERNSHIPS",
+
+    back_jobs: "JOBS",
     placements: "JOBS",
     work_perm: "JOBS",
     back_main: "GREETING",
