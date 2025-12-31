@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Message } from "./ChatInterface";
+import favicon from "@/assets/favicon_transparent.ico";
 
 interface ChatMessageProps {
   message: Message;
@@ -37,7 +38,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             <div className="flex items-center">
               <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center mr-1 overflow-hidden">
                 <img
-                  src="/favicon_transparent.ico"
+                  src={favicon}
                   alt="Global Minds"
                   className="w-full h-full object-cover"
                 />

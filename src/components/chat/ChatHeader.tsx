@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import favicon from "@/assets/favicon_transparent.ico";
 
 interface ChatHeaderProps {
   onClose?: () => void;
@@ -12,7 +13,7 @@ const ChatHeader = ({ onClose }: ChatHeaderProps) => {
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-lg overflow-hidden">
             <img
-              src="/favicon_transparent.ico"
+              src={favicon}
               alt="Global Minds India"
               className="w-full h-full object-cover"
             />
