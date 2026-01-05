@@ -20,15 +20,15 @@ export interface Message {
 
 const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
   const [currentState, setCurrentState] = useState(() => {
-    const saved = sessionStorage.getItem('chatState');
+    const saved = sessionStorage.getItem("chatState");
     return saved ? JSON.parse(saved) : chatFlow.start_state;
   });
   const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = sessionStorage.getItem('chatMessages');
+    const saved = sessionStorage.getItem("chatMessages");
     if (saved) {
       return JSON.parse(saved).map((m: any) => ({
         ...m,
-        timestamp: new Date(m.timestamp)
+        timestamp: new Date(m.timestamp),
       }));
     }
     return [
@@ -59,7 +59,7 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     date?: string;
     slot?: string;
   }>(() => {
-    const saved = sessionStorage.getItem('scheduleData');
+    const saved = sessionStorage.getItem("scheduleData");
     return saved ? JSON.parse(saved) : {};
   });
 
@@ -74,15 +74,15 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
 
   /** PERSISTENCE */
   useEffect(() => {
-    sessionStorage.setItem('chatState', JSON.stringify(currentState));
+    sessionStorage.setItem("chatState", JSON.stringify(currentState));
   }, [currentState]);
 
   useEffect(() => {
-    sessionStorage.setItem('chatMessages', JSON.stringify(messages));
+    sessionStorage.setItem("chatMessages", JSON.stringify(messages));
   }, [messages]);
 
   useEffect(() => {
-    sessionStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+    sessionStorage.setItem("scheduleData", JSON.stringify(scheduleData));
   }, [scheduleData]);
 
   /** AUTO SCROLL - IMPROVED */
@@ -90,13 +90,13 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     const viewport = scrollAreaRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]"
     ) as HTMLElement;
-    
+
     if (!viewport || !shouldAutoScroll) return;
 
     // Smooth scroll to bottom
     viewport.scrollTo({
       top: viewport.scrollHeight,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   }, [messages, isTyping, shouldAutoScroll]);
 
@@ -105,15 +105,15 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     const viewport = scrollAreaRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]"
     ) as HTMLElement;
-    
+
     if (!viewport) return;
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = viewport;
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 50; // 50px threshold
-      
+
       setShouldAutoScroll(isNearBottom);
-      
+
       if (!isNearBottom) {
         setIsUserScrolling(true);
       } else {
@@ -121,13 +121,16 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
       }
     };
 
-    viewport.addEventListener('scroll', handleScroll);
-    return () => viewport.removeEventListener('scroll', handleScroll);
+    viewport.addEventListener("scroll", handleScroll);
+    return () => viewport.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Reset auto-scroll when user sends a message
   useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'user') {
+    if (
+      messages.length > 0 &&
+      messages[messages.length - 1].sender === "user"
+    ) {
       setShouldAutoScroll(true);
       setIsUserScrolling(false);
     }
@@ -153,7 +156,7 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     const slots: string[] = [];
 
     for (let hour = startHour; hour <= endHour; hour++) {
-      for (let min = 0; min <60; min += intervalMinutes) {
+      for (let min = 0; min < 60; min += intervalMinutes) {
         const h = hour.toString().padStart(2, "0");
         const m = min.toString().padStart(2, "0");
         slots.push(`${h}:${m}`);
@@ -168,7 +171,8 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
   /** VALIDATION FUNCTIONS */
   const validateName = (name: string) => {
     if (name.length < 3) return "Name must be at least 3 characters long.";
-    if (!/^[a-zA-Z\s]+$/.test(name)) return "Name should only contain letters and spaces.";
+    if (!/^[a-zA-Z\s]+$/.test(name))
+      return "Name should only contain letters and spaces.";
     return null;
   };
 
@@ -180,8 +184,10 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
   const validatePhone = (phone: string) => {
     if (phone.length !== 10) return "Phone number must be exactly 10 digits.";
     if (!/^\d+$/.test(phone)) return "Phone number should only contain digits.";
-    if (/^[12345]/.test(phone)) return "Phone number cannot start with 1, 2, 3, 4, or 5.";
-    if (/(.)\1{4,}/.test(phone)) return "Phone number cannot have more than 4 consecutive same digits.";
+    if (/^[12345]/.test(phone))
+      return "Phone number cannot start with 1, 2, 3, 4, or 5.";
+    if (/(.)\1{4,}/.test(phone))
+      return "Phone number cannot have more than 4 consecutive same digits.";
     return null;
   };
 
@@ -320,8 +326,8 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
     setShowOptions(true);
     setShowBackButton(false);
     setBookingCompleted(false);
-    sessionStorage.removeItem('chatState');
-    sessionStorage.removeItem('scheduleData');
+    sessionStorage.removeItem("chatState");
+    sessionStorage.removeItem("scheduleData");
 
     // Explicitly scroll to bottom
     setTimeout(() => {
@@ -365,300 +371,319 @@ const ChatInterface = ({ onClose }: { onClose?: () => void }) => {
       <div className="relative z-10 flex flex-col h-full">
         <ChatHeader onClose={onClose} />
 
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((m) => (
-            <ChatMessage key={m.id} message={m} />
-          ))}
+        <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((m) => (
+              <ChatMessage key={m.id} message={m} />
+            ))}
 
-          {isTyping && <TypingIndicator />}
+            {isTyping && <TypingIndicator />}
 
-          {/* CONFIRM DETAILS */}
-          {currentState === "SCHEDULE_CONFIRM" && (
-            <div className="bg-card border rounded-xl p-4 max-w-sm">
-              <h3 className="font-medium mb-3">Please confirm your details:</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center">
-                  {editingField === "name" ? (
-                    <input
-                      type="text"
-                      value={scheduleData.name || ""}
-                      onChange={(e) => setScheduleData(p => ({ ...p, name: e.target.value }))}
-                      className="flex-1 border rounded px-2 py-1 mr-2"
-                      autoFocus
-                    />
-                  ) : (
-                    <span>Name: {scheduleData.name}</span>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      if (editingField === "name") {
-                        const error = validateName(scheduleData.name || "");
-                        if (error) {
-                          setEditError(error);
-                          return;
+            {/* CONFIRM DETAILS */}
+            {currentState === "SCHEDULE_CONFIRM" && (
+              <div className="bg-card border rounded-xl p-4 max-w-sm">
+                <h3 className="font-medium mb-3">
+                  Please confirm your details:
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    {editingField === "name" ? (
+                      <input
+                        type="text"
+                        value={scheduleData.name || ""}
+                        onChange={(e) =>
+                          setScheduleData((p) => ({
+                            ...p,
+                            name: e.target.value,
+                          }))
                         }
-                        setEditError(null);
-                        setEditingField(null);
-                      } else {
-                        setEditingField("name");
-                        setEditError(null);
-                      }
-                    }}
-                  >
-                    {editingField === "name" ? "Save" : "Edit"}
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center">
-                  {editingField === "phone" ? (
-                    <input
-                      type="text"
-                      value={scheduleData.phone || ""}
-                      onChange={(e) => setScheduleData(p => ({ ...p, phone: e.target.value }))}
-                      className="flex-1 border rounded px-2 py-1 mr-2"
-                      autoFocus
-                    />
-                  ) : (
-                    <span>Phone: {scheduleData.phone}</span>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      if (editingField === "phone") {
-                        const error = validatePhone(scheduleData.phone || "");
-                        if (error) {
-                          setEditError(error);
-                          return;
+                        className="flex-1 border rounded px-2 py-1 mr-2"
+                        autoFocus
+                      />
+                    ) : (
+                      <span>Name: {scheduleData.name}</span>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (editingField === "name") {
+                          const error = validateName(scheduleData.name || "");
+                          if (error) {
+                            setEditError(error);
+                            return;
+                          }
+                          setEditError(null);
+                          setEditingField(null);
+                        } else {
+                          setEditingField("name");
+                          setEditError(null);
                         }
-                        setEditError(null);
-                        setEditingField(null);
-                      } else {
-                        setEditingField("phone");
-                        setEditError(null);
-                      }
-                    }}
-                  >
-                    {editingField === "phone" ? "Save" : "Edit"}
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center">
-                  {editingField === "email" ? (
-                    <input
-                      type="email"
-                      value={scheduleData.email || ""}
-                      onChange={(e) => setScheduleData(p => ({ ...p, email: e.target.value }))}
-                      className="flex-1 border rounded px-2 py-1 mr-2"
-                      autoFocus
-                    />
-                  ) : (
-                    <span>Email: {scheduleData.email}</span>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      if (editingField === "email") {
-                        const error = validateEmail(scheduleData.email || "");
-                        if (error) {
-                          setEditError(error);
-                          return;
+                      }}
+                    >
+                      {editingField === "name" ? "Save" : "Edit"}
+                    </Button>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    {editingField === "phone" ? (
+                      <input
+                        type="text"
+                        value={scheduleData.phone || ""}
+                        onChange={(e) =>
+                          setScheduleData((p) => ({
+                            ...p,
+                            phone: e.target.value,
+                          }))
                         }
-                        setEditError(null);
-                        setEditingField(null);
-                      } else {
-                        setEditingField("email");
-                        setEditError(null);
-                      }
-                    }}
-                  >
-                    {editingField === "email" ? "Save" : "Edit"}
-                  </Button>
+                        className="flex-1 border rounded px-2 py-1 mr-2"
+                        autoFocus
+                      />
+                    ) : (
+                      <span>Phone: {scheduleData.phone}</span>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (editingField === "phone") {
+                          const error = validatePhone(scheduleData.phone || "");
+                          if (error) {
+                            setEditError(error);
+                            return;
+                          }
+                          setEditError(null);
+                          setEditingField(null);
+                        } else {
+                          setEditingField("phone");
+                          setEditError(null);
+                        }
+                      }}
+                    >
+                      {editingField === "phone" ? "Save" : "Edit"}
+                    </Button>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    {editingField === "email" ? (
+                      <input
+                        type="email"
+                        value={scheduleData.email || ""}
+                        onChange={(e) =>
+                          setScheduleData((p) => ({
+                            ...p,
+                            email: e.target.value,
+                          }))
+                        }
+                        className="flex-1 border rounded px-2 py-1 mr-2"
+                        autoFocus
+                      />
+                    ) : (
+                      <span>Email: {scheduleData.email}</span>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (editingField === "email") {
+                          const error = validateEmail(scheduleData.email || "");
+                          if (error) {
+                            setEditError(error);
+                            return;
+                          }
+                          setEditError(null);
+                          setEditingField(null);
+                        } else {
+                          setEditingField("email");
+                          setEditError(null);
+                        }
+                      }}
+                    >
+                      {editingField === "email" ? "Save" : "Edit"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              {editError && (
-                <p className="text-red-600 text-xs mt-2">{editError}</p>
-              )}
-              <Button
-                className="mt-4 w-full"
-                disabled={editingField !== null}
-                onClick={() => {
-                  setCurrentState("SCHEDULE_DATE");
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      text: chatFlow.states["SCHEDULE_DATE"].message,
-                      sender: "bot",
-                      timestamp: new Date(),
-                    },
-                  ]);
-                }}
-              >
-                Confirm & Continue
-              </Button>
-            </div>
-          )}
-
-          {/* DATE SELECTION */}
-          {/* CALENDAR DATE PICKER */}
-          {currentState === "SCHEDULE_DATE" && (
-            <div className="bg-card border rounded-xl p-4 max-w-sm">
-              <label className="text-sm font-medium mb-2 block">
-                Choose Date
-              </label>
-
-              <input
-                type="date"
-                min={minDate}
-                max={maxDate}
-                value={scheduleData.date || ""}
-                onChange={(e) =>
-                  setScheduleData((p) => ({ ...p, date: e.target.value }))
-                }
-                className="w-full border rounded-md px-3 py-2 text-sm"
-              />
-
-              <Button
-                className="mt-3 w-full"
-                disabled={!scheduleData.date}
-                onClick={() => {
-                  setCurrentState("SCHEDULE_SLOT");
-
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      text: chatFlow.states["SCHEDULE_SLOT"].message,
-                      sender: "bot",
-                      timestamp: new Date(),
-                    },
-                  ]);
-                }}
-              >
-                Continue
-              </Button>
-            </div>
-          )}
-
-          {/* 🕒 SLOT SELECTION */}
-          {currentState === "SCHEDULE_SLOT" && (
-            <div className="flex flex-wrap gap-2">
-              {timeSlots.map((slot) => (
+                {editError && (
+                  <p className="text-red-600 text-xs mt-2">{editError}</p>
+                )}
                 <Button
-                  key={slot}
-                  size="sm"
-                  variant="outline"
-                  onClick={async () => {
-                    const start_time = `${scheduleData.date} ${slot}`;
+                  className="mt-4 w-full"
+                  disabled={editingField !== null}
+                  onClick={() => {
+                    setCurrentState("SCHEDULE_DATE");
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: Date.now().toString(),
+                        text: chatFlow.states["SCHEDULE_DATE"].message,
+                        sender: "bot",
+                        timestamp: new Date(),
+                      },
+                    ]);
+                  }}
+                >
+                  Confirm & Continue
+                </Button>
+              </div>
+            )}
 
-                    const payload = {
-                      name: scheduleData.name,
-                      phone: scheduleData.phone,
-                      email: scheduleData.email,
-                      topic: "Study Abroad Counselling Session",
-                      start_time, // YYYY-MM-DD HH:mm
-                    };
+            {/* DATE SELECTION */}
+            {/* CALENDAR DATE PICKER */}
+            {currentState === "SCHEDULE_DATE" && (
+              <div className="bg-card border rounded-xl p-4 max-w-sm">
+                <label className="text-sm font-medium mb-2 block">
+                  Choose Date
+                </label>
 
-                    // Show typing while booking
-                    setIsTyping(true);
+                <input
+                  type="date"
+                  min={minDate}
+                  max={maxDate}
+                  value={scheduleData.date || ""}
+                  onChange={(e) =>
+                    setScheduleData((p) => ({ ...p, date: e.target.value }))
+                  }
+                  className="w-full border rounded-md px-3 py-2 text-sm"
+                />
 
-                    try {
-                      const res = await BookingService.createBooking(payload);
+                <Button
+                  className="mt-3 w-full"
+                  disabled={!scheduleData.date}
+                  onClick={() => {
+                    setCurrentState("SCHEDULE_SLOT");
 
-                      setIsTyping(false);
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: Date.now().toString(),
+                        text: chatFlow.states["SCHEDULE_SLOT"].message,
+                        sender: "bot",
+                        timestamp: new Date(),
+                      },
+                    ]);
+                  }}
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
 
-                      if (res.success) {
-                        const { date, time } =
-                          formatDateTimeReadable(start_time);
+            {/* 🕒 SLOT SELECTION */}
+            {currentState === "SCHEDULE_SLOT" && (
+              <div className="flex flex-wrap gap-2">
+                {timeSlots.map((slot) => (
+                  <Button
+                    key={slot}
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      const start_time = `${scheduleData.date} ${slot}`;
 
-                        setMessages((prev) => [
-                          ...prev,
-                          {
-                            id: Date.now().toString(),
-                            text: `Thank you for scheduling a counselling session with Global Minds India.
+                      const payload = {
+                        name: scheduleData.name,
+                        phone: scheduleData.phone,
+                        email: scheduleData.email,
+                        topic: "Study Abroad Counselling Session",
+                        start_time, // YYYY-MM-DD HH:mm
+                      };
+
+                      // Show typing while booking
+                      setIsTyping(true);
+
+                      try {
+                        const res = await BookingService.createBooking(payload);
+
+                        setIsTyping(false);
+
+                        if (res.success) {
+                          const { date, time } =
+                            formatDateTimeReadable(start_time);
+
+                          setMessages((prev) => [
+                            ...prev,
+                            {
+                              id: Date.now().toString(),
+                              text: `Thank you for scheduling a counselling session with Global Minds India.
 
 We've successfully shared your session details with your registered email address. Please check your inbox, and don't forget to look in the spam folder if you don't see it right away.
 
 We're excited to connect with you and support you in shaping a successful future. See you soon!`,
-                            sender: "bot",
-                            timestamp: new Date(),
-                          },
-                        ]);
+                              sender: "bot",
+                              timestamp: new Date(),
+                            },
+                          ]);
 
-                        setBookingCompleted(true);
-                        setShowOptions(false);
-                      } else {
+                          setCurrentState("BOOKING_DONE");
+                          setBookingCompleted(true);
+                          setShowOptions(false);
+                        } else {
+                          setMessages((prev) => [
+                            ...prev,
+                            {
+                              id: Date.now().toString(),
+                              text: `⚠️ Unable to book meeting:\n${res.error}`,
+                              sender: "bot",
+                              timestamp: new Date(),
+                            },
+                          ]);
+                        }
+                      } catch (err: any) {
+                        setIsTyping(false);
+
                         setMessages((prev) => [
                           ...prev,
                           {
                             id: Date.now().toString(),
-                            text: `⚠️ Unable to book meeting:\n${res.error}`,
+                            text: "❌ Something went wrong while booking the meeting.\nPlease try another slot or come back later.",
                             sender: "bot",
                             timestamp: new Date(),
                           },
                         ]);
                       }
-                    } catch (err: any) {
-                      setIsTyping(false);
-
-                      setMessages((prev) => [
-                        ...prev,
-                        {
-                          id: Date.now().toString(),
-                          text: "❌ Something went wrong while booking the meeting.\nPlease try another slot or come back later.",
-                          sender: "bot",
-                          timestamp: new Date(),
-                        },
-                      ]);
-                    }
-                  }}
-                >
-                  {slot}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          {/* BOOKING COMPLETED - ONLY BACK BUTTON */}
-          {bookingCompleted && (
-            <Button size="sm" variant="secondary" onClick={goToMainMenu}>
-              🔙 Back to Main Menu
-            </Button>
-          )}
-
-          {/* NORMAL OPTIONS */}
-          {!bookingCompleted && showOptions &&
-            chatFlow.states[currentState]?.buttons?.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {chatFlow.states[currentState].buttons.map((btn) => (
-                  <Button
-                    key={btn.id}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleStateButtonClick(btn.id)}
+                    }}
                   >
-                    {btn.label}
+                    {slot}
                   </Button>
                 ))}
               </div>
             )}
 
-          {!bookingCompleted && showBackButton && (
-            <Button size="sm" variant="secondary" onClick={goToMainMenu}>
-              🔙 Back to Main Menu
-            </Button>
-          )}
+            {/* BOOKING COMPLETED - ONLY BACK BUTTON */}
+            {bookingCompleted && (
+              <Button size="sm" variant="secondary" onClick={goToMainMenu}>
+                🔙 Back to Main Menu
+              </Button>
+            )}
 
-          {/* SCHEDULING BACK BUTTON */}
-          {!bookingCompleted && isScheduling && (
-            <Button size="sm" variant="secondary" onClick={goToMainMenu}>
-              🔙 Back to Main Menu
-            </Button>
-          )}
-        </div>
+            {/* NORMAL OPTIONS */}
+            {!bookingCompleted &&
+              showOptions &&
+              chatFlow.states[currentState]?.buttons?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {chatFlow.states[currentState].buttons.map((btn) => (
+                    <Button
+                      key={btn.id}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleStateButtonClick(btn.id)}
+                    >
+                      {btn.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+            {!bookingCompleted && showBackButton && (
+              <Button size="sm" variant="secondary" onClick={goToMainMenu}>
+                🔙 Back to Main Menu
+              </Button>
+            )}
+
+            {/* SCHEDULING BACK BUTTON */}
+            {!bookingCompleted && isScheduling && (
+              <Button size="sm" variant="secondary" onClick={goToMainMenu}>
+                🔙 Back to Main Menu
+              </Button>
+            )}
+          </div>
         </ScrollArea>
 
         {/* INPUT */}
